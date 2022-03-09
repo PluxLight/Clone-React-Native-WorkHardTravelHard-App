@@ -52,13 +52,13 @@ export default function App() {
     setText("");
   };
 
-  const checkToDo = async (key) => {
-    // Alert.alert("Click!");
+  const checkToDo = (key) => {
     const newToDos = { ...toDos };
     newToDos[key].done = newToDos[key].done ? false : true;
-    // console.log(newToDos[key]);
+    // setDone(!newToDos[key].done);
+    // console.log(newToDos[key])
     setToDos(newToDos);
-    await saveToDos(newToDos);
+    saveToDos(newToDos);
   }
 
   const deleteToDo = (key) => {
@@ -183,8 +183,18 @@ const styles = StyleSheet.create({
 
 // 챌린지
 // 1. work, tralvel 마지막 위치 기억, 재시작시 마지막 위치에서 시작할 수 있게
+
+
+
 // 2. toDo 리스트 완료 상태로 만드는 f 만들기, 체크박스 취소선
 // hint done : true/false object 에 추가해서
+// https://icons.expo.fyi/Fontisto/checkbox-active
+// https://icons.expo.fyi/Fontisto/checkbox-passive
+// 이 두가지 done 상태에 따라서 아이콘 바꾸는 방식으로 체크 체크아웃 하게끔 하고
+// 체크박스 아이콘 누르는걸로도 done t/f 바뀌게끔
+
+
+
 // 3. 유저가 text를 수정할 수 있게
 
 
