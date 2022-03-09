@@ -17,41 +17,55 @@ const STORAGE_KEY = "@toDos";
 
 export default function App() {
   const [working, setWorking] = useState(true);
+  const [done, setDone] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
   useEffect(() => {
     loadToDos();
   }, []);
+
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
+
   const saveToDos = async (toSave) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   };
+
   const loadToDos = async () => {
     try {
       const s = await AsyncStorage.getItem(STORAGE_KEY);
       setToDos(JSON.parse(s));
-    } catch (e) {
-
-    }
+    } catch (e) {}
   };
+
   const addToDo = async () => {
     if (text === "") {
       return;
     }
     const newToDos = {
       ...toDos,
-      [Date.now()]: { text, working },
+      [Date.now()]: { text, working, done },
     };
     setToDos(newToDos);
     await saveToDos(newToDos);
     setText("");
   };
+
+  const checkToDo = async (key) => {
+    // Alert.alert("Click!");
+    const newToDos = { ...toDos };
+    newToDos[key].done = newToDos[key].done ? false : true;
+    // console.log(newToDos[key]);
+    setToDos(newToDos);
+    await saveToDos(newToDos);
+  }
+
   const deleteToDo = (key) => {
     Alert.alert("Delete To Do", "Are you sure?", [
       { text: "Cancel" },
-      { text: "I'm Sure",
+      {
+        text: "I'm Sure",
         style: "destructive",
         onPress: () => {
           const newToDos = { ...toDos };
@@ -96,16 +110,21 @@ export default function App() {
         style={styles.input}
       />
       <ScrollView>
-        {toDos && Object.keys(toDos).map((key) =>
-          toDos[key].working === working ? (
-            <View style={styles.toDo} key={key}>
-              <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Fontisto name="trash" size={18} color={theme.grey} />
-              </TouchableOpacity>
-            </View>
-          ) : null
-        )}
+        {toDos &&
+          Object.keys(toDos).map((key) =>
+            toDos[key].working === working ? (
+              <View style={styles.toDo} key={key}>
+                <Text
+                style={toDos[key].done ? styles.toDoText : styles.toDoTextChecked}
+                onPress={() => checkToDo(key)}>
+                  {toDos[key].text}
+                  </Text>
+                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <Fontisto name="trash" size={18} color={theme.grey} />
+                </TouchableOpacity>
+              </View>
+            ) : null
+          )}
       </ScrollView>
     </View>
   );
@@ -120,7 +139,7 @@ const styles = StyleSheet.create({
   scrollView: {
     // backgroundColor: 'pink',
     // marginHorizontal: 20,
-    flex : 1,
+    flex: 1,
   },
   header: {
     justifyContent: "space-between",
@@ -154,10 +173,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  toDoTextChecked: {
+    color: "black",
+    fontSize: 16,
+    fontWeight: "600",
+    textDecorationLine: "line-through",
+  },
 });
 
 // 챌린지
 // 1. work, tralvel 마지막 위치 기억, 재시작시 마지막 위치에서 시작할 수 있게
 // 2. toDo 리스트 완료 상태로 만드는 f 만들기, 체크박스 취소선
-// hint done : true/false
+// hint done : true/false object 에 추가해서
 // 3. 유저가 text를 수정할 수 있게
+
+
+// https://github.com/WrathChaos/react-native-bouncy-checkbox
