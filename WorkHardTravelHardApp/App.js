@@ -6,8 +6,10 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  Alert,
   ScrollView,
 } from "react-native";
+import { Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "./colors";
 
@@ -34,7 +36,6 @@ export default function App() {
 
     }
   };
-
   const addToDo = async () => {
     if (text === "") {
       return;
@@ -46,6 +47,20 @@ export default function App() {
     setToDos(newToDos);
     await saveToDos(newToDos);
     setText("");
+  };
+  const deleteToDo = (key) => {
+    Alert.alert("Delete To Do", "Are you sure?", [
+      { text: "Cancel" },
+      { text: "I'm Sure",
+        style: "destructive",
+        onPress: () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          saveToDos(newToDos);
+        },
+      },
+    ]);
   };
 
   return (
@@ -85,6 +100,9 @@ export default function App() {
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Fontisto name="trash" size={18} color={theme.grey} />
+              </TouchableOpacity>
             </View>
           ) : null
         )}
@@ -96,7 +114,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.toDoBg,
+    backgroundColor: theme.bg,
     paddingHorizontal: 20,
   },
   scrollView: {
@@ -122,11 +140,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   toDo: {
-    backgroundColor: theme.grey,
+    backgroundColor: theme.toDoBg,
     marginBottom: 10,
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
@@ -134,3 +155,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+// 챌린지
+// 1. work, tralvel 마지막 위치 기억, 재시작시 마지막 위치에서 시작할 수 있게
+// 2. toDo 리스트 완료 상태로 만드는 f 만들기, 체크박스 취소선
+// hint done : true/false
+// 3. 유저가 text를 수정할 수 있게
