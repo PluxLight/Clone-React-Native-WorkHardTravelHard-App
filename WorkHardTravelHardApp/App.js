@@ -114,12 +114,17 @@ export default function App() {
           Object.keys(toDos).map((key) =>
             toDos[key].working === working ? (
               <View style={styles.toDo} key={key}>
+                <TouchableOpacity flex="10" onPress={() => checkToDo(key)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                {toDos[key].done ? 
+                <Fontisto name="checkbox-passive" size={24} color="white" />
+                : <Fontisto name="checkbox-active" size={24} color="white" />}
+                </TouchableOpacity>
                 <Text
                 style={toDos[key].done ? styles.toDoText : styles.toDoTextChecked}
                 onPress={() => checkToDo(key)}>
                   {toDos[key].text}
                   </Text>
-                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <TouchableOpacity onPress={() => deleteToDo(key)} hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}>
                   <Fontisto name="trash" size={18} color={theme.grey} />
                 </TouchableOpacity>
               </View>
@@ -129,6 +134,7 @@ export default function App() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -166,20 +172,26 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+    flex: 1,
+    marginLeft: 10,
   },
   toDoTextChecked: {
-    color: "black",
+    color: "white",
     fontSize: 16,
     fontWeight: "600",
     textDecorationLine: "line-through",
+    flex: 1,
+    marginLeft: 10,
   },
 });
+
+// 왜 toDoText, toDoTextChecked에 flex를 넣으면 모양이 딱 잡히는지 모르겠음
 
 // 챌린지
 // 1. work, tralvel 마지막 위치 기억, 재시작시 마지막 위치에서 시작할 수 있게
