@@ -10,27 +10,50 @@ import {
   ScrollView,
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
+import { EvilIcons } from '@expo/vector-icons'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "./colors";
 
 const STORAGE_KEY = "@toDos";
+const STORAGE_WORKING = "@working";
 
 export default function App() {
-  const [working, setWorking] = useState(true);
+  const [working, setWorking] = useState();
   const [done, setDone] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
   useEffect(() => {
     loadToDos();
+    loadWorking();
   }, []);
 
-  const travel = () => setWorking(false);
-  const work = () => setWorking(true);
+  const travel = () => {
+    setWorking(false);
+    saveWorking(false);
+  };
+
+  const work = () => {
+    setWorking(true);
+    saveWorking(true);
+  };
+
   const onChangeText = (payload) => setText(payload);
 
   const saveToDos = async (toSave) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   };
+
+  const saveWorking = async (toSave) => {
+    await AsyncStorage.setItem(STORAGE_WORKING, JSON.stringify(toSave));
+    console.log(await AsyncStorage.getItem(STORAGE_WORKING));
+  };
+
+  const loadWorking = async () => {
+    try {
+      const s = await AsyncStorage.getItem(STORAGE_WORKING);
+      setWorking(JSON.parse(s));
+    } catch (e) {}
+  }
 
   const loadToDos = async () => {
     try {
@@ -59,6 +82,10 @@ export default function App() {
     // console.log(newToDos[key])
     setToDos(newToDos);
     saveToDos(newToDos);
+  };
+
+  const insertToDo = (key) => {
+    const newToDos = { ...toDos };
   }
 
   const deleteToDo = (key) => {
@@ -83,7 +110,8 @@ export default function App() {
       <View style={styles.header}>
         <TouchableOpacity onPress={work}>
           <Text
-            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
+            style={{ ...styles.btnText, 
+              color: working ? "white" : theme.grey }}
           >
             Work
           </Text>
@@ -124,8 +152,11 @@ export default function App() {
                 onPress={() => checkToDo(key)}>
                   {toDos[key].text}
                   </Text>
-                <TouchableOpacity onPress={() => deleteToDo(key)} hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}>
-                  <Fontisto name="trash" size={18} color={theme.grey} />
+                <TouchableOpacity /*onPress={() => deleteToDo(key)} hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}*/>
+                <EvilIcons name="pencil" size={18} color="white"/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteToDo(key)} /*hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}*/>
+                  <Fontisto name="trash" size={18} color={"white"} style={styles.iconStyless} />
                 </TouchableOpacity>
               </View>
             ) : null
@@ -137,6 +168,9 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
+  iconStyless: {
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.bg,
@@ -204,10 +238,17 @@ const styles = StyleSheet.create({
 // https://icons.expo.fyi/Fontisto/checkbox-passive
 // 이 두가지 done 상태에 따라서 아이콘 바꾸는 방식으로 체크 체크아웃 하게끔 하고
 // 체크박스 아이콘 누르는걸로도 done t/f 바뀌게끔
+// 완성
 
 
 
 // 3. 유저가 text를 수정할 수 있게
+// 삼항 연산자 만들어서 true일때는 text false면 textinput으로 바꾸는건 어떨까
+// 처음부터 textinput으로 사용하고 연필 누르면 textinput 수정 상태 변경하게끔 하거나
 
 
-// https://github.com/WrathChaos/react-native-bouncy-checkbox
+// 공부 다시할 것
+// const saveToDos = async (toSave) => {
+//   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+// };
+// JSON.stringify(toSave) 이거 왜 해줘야 하는지
