@@ -18,10 +18,11 @@ const STORAGE_KEY = "@toDos";
 const STORAGE_WORKING = "@working";
 
 export default function App() {
-  const [working, setWorking] = useState();
+  const [working, setWorking] = useState(true);
   const [done, setDone] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
+  const [editAble, setEditAble] = useState(false);
   useEffect(() => {
     loadToDos();
     loadWorking();
@@ -45,7 +46,7 @@ export default function App() {
 
   const saveWorking = async (toSave) => {
     await AsyncStorage.setItem(STORAGE_WORKING, JSON.stringify(toSave));
-    console.log(await AsyncStorage.getItem(STORAGE_WORKING));
+    // console.log(await AsyncStorage.getItem(STORAGE_WORKING));
   };
 
   const loadWorking = async () => {
@@ -84,8 +85,9 @@ export default function App() {
     saveToDos(newToDos);
   };
 
-  const insertToDo = (key) => {
+  const editToDo = (key) => {
     const newToDos = { ...toDos };
+    console.log(key, newToDos[key], )
   }
 
   const deleteToDo = (key) => {
@@ -110,8 +112,7 @@ export default function App() {
       <View style={styles.header}>
         <TouchableOpacity onPress={work}>
           <Text
-            style={{ ...styles.btnText, 
-              color: working ? "white" : theme.grey }}
+            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
           >
             Work
           </Text>
@@ -142,22 +143,42 @@ export default function App() {
           Object.keys(toDos).map((key) =>
             toDos[key].working === working ? (
               <View style={styles.toDo} key={key}>
-                <TouchableOpacity flex="10" onPress={() => checkToDo(key)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                {toDos[key].done ? 
-                <Fontisto name="checkbox-passive" size={24} color="white" />
-                : <Fontisto name="checkbox-active" size={24} color="white" />}
+                <TouchableOpacity
+                  flex="10"
+                  onPress={() => checkToDo(key)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  {toDos[key].done ? (
+                    <Fontisto name="checkbox-passive" size={24} color="white" />
+                  ) : (
+                    <Fontisto name="checkbox-active" size={24} color="white" />
+                  )}
                 </TouchableOpacity>
-                <Text
-                style={toDos[key].done ? styles.toDoText : styles.toDoTextChecked}
-                onPress={() => checkToDo(key)}>
+                <TextInput
+                onSubmitEditing={editToDo}
+                  style={
+                    toDos[key].done ? styles.toDoText : styles.toDoTextChecked
+                  }
+                  onChangeText={onChangeText}
+                  returnKeyType="done"
+                  onPress={ () => checkToDo(key) }
+                  editable={false}
+                  multiline={true}
+                >
                   {toDos[key].text}
-                  </Text>
-                <TouchableOpacity /*onPress={() => deleteToDo(key)} hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}*/>
-                <EvilIcons name="pencil" size={18} color="white"/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteToDo(key)} /*hitSlop={{ top: 15, bottom: 15, left: 15, right: 15}}*/>
-                  <Fontisto name="trash" size={18} color={"white"} style={styles.iconStyless} />
-                </TouchableOpacity>
+                </TextInput>
+                <EvilIcons.Button
+                  name="pencil" size={30} backgroundColor={theme.toDoBg}
+                  iconStyle={{ marginRight: 0 }}
+                  style={{ padding: 5 }}
+                  onPress={() => editToDo(key)}
+                />
+                <EvilIcons.Button
+                  name="trash" size={30} backgroundColor={theme.toDoBg}
+                  iconStyle={{ marginRight: 0 }}
+                  style={{ padding: 5 }}
+                  onPress={() => deleteToDo(key)}
+                />
               </View>
             ) : null
           )}
@@ -168,7 +189,7 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
-  iconStyless: {
+  iconStyle: {
     marginLeft: 10,
   },
   container: {
