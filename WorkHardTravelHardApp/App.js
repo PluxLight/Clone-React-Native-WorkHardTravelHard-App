@@ -22,7 +22,7 @@ export default function App() {
   const [done, setDone] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
-  const [editAble, setEditAble] = useState(false);
+  const [edit, setEdit] = useState(false);
   useEffect(() => {
     loadToDos();
     loadWorking();
@@ -69,7 +69,7 @@ export default function App() {
     }
     const newToDos = {
       ...toDos,
-      [Date.now()]: { text, working, done },
+      [Date.now()]: { text, working, done, edit },
     };
     setToDos(newToDos);
     await saveToDos(newToDos);
@@ -87,7 +87,10 @@ export default function App() {
 
   const editToDo = (key) => {
     const newToDos = { ...toDos };
-    console.log(key, newToDos[key], )
+    newToDos[key].edit = newToDos[key].edit ? false : true
+    // console.log(key, newToDos[key], )
+    setToDos(newToDos);
+    saveToDos(newToDos);
   }
 
   const deleteToDo = (key) => {
@@ -137,6 +140,7 @@ export default function App() {
           working ? "What do you have to do?" : "Where do you want to go?"
         }
         style={styles.input}
+        // multiline을 사용할 수 없다 값을 전달하기 위한 완료키와 줄바꿈 키가 동일해지기 때문이다
       />
       <ScrollView>
         {toDos &&
@@ -144,7 +148,6 @@ export default function App() {
             toDos[key].working === working ? (
               <View style={styles.toDo} key={key}>
                 <TouchableOpacity
-                  flex="10"
                   onPress={() => checkToDo(key)}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
@@ -159,25 +162,27 @@ export default function App() {
                   style={
                     toDos[key].done ? styles.toDoText : styles.toDoTextChecked
                   }
-                  onChangeText={onChangeText}
                   returnKeyType="done"
-                  onPress={ () => checkToDo(key) }
-                  editable={false}
+                  // onPress={ () => checkToDo(key) }
+                  editable={toDos[key].edit}
                   multiline={true}
+                  value={toDos[key].text}
+                  onChangeText={onChangeText}
                 >
-                  {toDos[key].text}
+                  {/* {toDos[key].text} */}
                 </TextInput>
                 <EvilIcons.Button
-                  name="pencil" size={30} backgroundColor={theme.toDoBg}
-                  iconStyle={{ marginRight: 0 }}
-                  style={{ padding: 5 }}
                   onPress={() => editToDo(key)}
+                  name="pencil" size={30} backgroundColor={theme.toDoBg}
+                  color={toDos[key].edit ? "black" : "white"}
+                  iconStyle={{ marginRight: 0 }}
+                  style={{ padding: 5}}
                 />
                 <EvilIcons.Button
+                  onPress={() => deleteToDo(key)}
                   name="trash" size={30} backgroundColor={theme.toDoBg}
                   iconStyle={{ marginRight: 0 }}
                   style={{ padding: 5 }}
-                  onPress={() => deleteToDo(key)}
                 />
               </View>
             ) : null
